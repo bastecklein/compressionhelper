@@ -1,0 +1,38 @@
+{
+    "name": "compressionhelper",
+    "version": "1.0.0",
+    "description": "Library for compressing and decompressing data in a worker thread with promises.",
+    "keywords": ["networking", "library", "ape apps"],
+    "homepage": "https://www.ape-apps.com",
+    "bugs": {
+        "email": "support@ape-apps.com"
+    },
+    "author": {
+        "name": "Ape Apps",
+        "email": "support@ape-apps.com",
+        "url": "https://www.ape-apps.com"
+    },
+    "funding": {
+        "type": "patreon",
+        "url": "https://www.patreon.com/apeapps"
+    },
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bastecklein/compressionhelper"
+    },
+    "main": "dist/compressionhelper.js",
+    "config": {},
+    "dependencies": {
+        "lz-string": "^1.4.4"
+    },
+    "devDependencies": {
+        "webpack": "^5.24.4",
+        "webpack-cli": "^4.5.0"
+    },
+    "private": false,
+    "type": "module",
+    "scripts": {
+        "build": "webpack"
+    }
+}
