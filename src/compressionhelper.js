@@ -103,3 +103,8 @@ function doCompressionWork(data, method) {
         data = null;
     });
 }
+
+export default {
+    compress,
+    decompress
+};
