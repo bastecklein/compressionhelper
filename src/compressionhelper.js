@@ -2,137 +2,104 @@ import { chunkString } from "common-helpers";
 
 const MAX_POST_LENGTH = 5000000;
 
-export function compress(options) {
-    let callback = null;
-    let data = null;
-        
-    if(options) {
-        if(options.callback) {
-            callback = options.callback;
-        }
-
-        if(options.data) {
-            data = options.data;
-        }
+export async function compress(data) {
+    if(!data) {
+        return null;
     }
 
-    if(!callback || !data) {
-
-        if(callback) {
-            callback(null);
-        }
-
-        return;
-    }
-
-    doCompressionWork(data, "compress", callback);
+    return await doCompressionWork(data, "compress");
 }
 
-export function decompress(options) {
-    let callback = null;
-    let data = null;
-    
-    if(options) {
-
-        if(options.callback) {
-            callback = options.callback;
-        }
-
-        if(options.data) {
-            data = options.data;
-        }
+export async function decompress(data) {
+    if(!data) {
+        return null;
     }
 
-    if(!callback || !data) {
-
-        if(callback) {
-            callback(null);
-        }
-
-        return;
-    }
-
-    doCompressionWork(data, "decompress", callback);
+    return await doCompressionWork(data, "decompress");
 }
 
-function doCompressionWork(data, method, callback) {
+function doCompressionWork(data, method) {
 
-    const cw = new Worker("compressionworker.js");
+    return new Promise((resolve, reject) => {
+        const cw = new Worker("compressionworker.js");
 
-    let inChunks = [];
-    let outStr = "";
+        let inChunks = [];
+        let outStr = "";
 
-    cw.onmessage = function(ev) {
-        const data = ev.data;
+        cw.onmessage = function(ev) {
+            const data = ev.data;
 
-        if(data && data.method) {
+            if(data && data.method) {
 
-            if(data.method == "outDone") {
-                callback(outStr);
-            }
+                if(data.method == "outDone") {
+                    resolve(outStr);
+                }
 
-            if(data.method == "nextOut") {
-                outStr += data.data;
+                if(data.method == "nextOut") {
+                    outStr += data.data;
 
-                cw.postMessage({
-                    method: "outChunkReq"
-                });
-            }
+                    cw.postMessage({
+                        method: "outChunkReq"
+                    });
+                }
 
-            if(data.method == "result") {
-                if(data.status && data.status == "complete") {
-                    if(data.chunked) {
+                if(data.method == "result") {
+                    if(data.status && data.status == "complete") {
+                        if(data.chunked) {
 
-                        outStr = "";
+                            outStr = "";
+
+                            cw.postMessage({
+                                method: "outChunkReq"
+                            });
+                        } else {
+                            resolve(data.data);
+                        }
+                    } else {
+                        reject({
+                            error: "failed"
+                        });
+                    }
+                }
+
+                if(data.method == "chunkReq") {
+                    if(inChunks && inChunks.length > 0) {
+                        const part = inChunks.shift();
 
                         cw.postMessage({
-                            method: "outChunkReq"
+                            method: "nextChunk",
+                            data: part
                         });
                     } else {
-                        callback(data.data);
+                        cw.postMessage({
+                            method: "chunkComplete",
+                            type: method
+                        });
                     }
-                } else {
-                    callback(null);
                 }
             }
+        };
 
-            if(data.method == "chunkReq") {
-                if(inChunks && inChunks.length > 0) {
-                    const part = inChunks.shift();
+        cw.onerror = function(e) {
+            reject(e);
+        };
 
-                    cw.postMessage({
-                        method: "nextChunk",
-                        data: part
-                    });
-                } else {
-                    cw.postMessage({
-                        method: "chunkComplete",
-                        type: method
-                    });
-                }
-            }
+        if(data.length > MAX_POST_LENGTH) {
+
+            inChunks = chunkString(data, MAX_POST_LENGTH);
+
+            cw.postMessage({
+                method: method,
+                chunked: true
+            });
+        } else {
+            cw.postMessage({
+                method: method,
+                data: data,
+                chunked: false
+            });
         }
-    };
 
-    cw.onerror = function(){
-        callback(null);
-    };
-
-    if(data.length > MAX_POST_LENGTH) {
-
-        inChunks = chunkString(data, MAX_POST_LENGTH);
-
-        cw.postMessage({
-            method: method,
-            chunked: true
-        });
-    } else {
-        cw.postMessage({
-            method: method,
-            data: data,
-            chunked: false
-        });
-    }
-
-    data = null;
+        data = null;
+    });
 }
