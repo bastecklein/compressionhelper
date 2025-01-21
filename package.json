@@ -24,7 +24,8 @@
     "main": "dist/compressionhelper.js",
     "config": {},
     "dependencies": {
-        "lz-string": "^1.4.4"
+        "lz-string": "^1.4.4",
+        "common-helpers": "git+ssh://git@github.com:bastecklein/common-helpers.git#main"
     },
     "devDependencies": {
         "webpack": "^5.24.4",

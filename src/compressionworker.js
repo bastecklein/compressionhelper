@@ -1,4 +1,5 @@
 import LZString from "lz-string";
+import { chunkString } from "common-helpers";
 
 const MAX_COMPRESS_LENGTH = 10000000;
 const MAX_POST_LENGTH = 5000000;
@@ -155,8 +156,4 @@ function postCompletedData(data) {
     }
 
     self.close();
-}
-
-function chunkString(str, length) {
-    return str.match(new RegExp(".{1," + length + "}", "g"));
 }

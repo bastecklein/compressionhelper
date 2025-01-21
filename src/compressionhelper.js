@@ -1,3 +1,5 @@
+import { chunkString } from "common-helpers";
+
 const MAX_POST_LENGTH = 5000000;
 
 export function compress(options) {
@@ -133,8 +135,4 @@ function doCompressionWork(data, method, callback) {
     }
 
     data = null;
-}
-
-function chunkString(str, length) {
-    return str.match(new RegExp(".{1," + length + "}", "g"));
 }
