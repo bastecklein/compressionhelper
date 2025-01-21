@@ -21,7 +21,7 @@
         "type": "git",
         "url": "https://github.com/bastecklein/compressionhelper"
     },
-    "main": "dist/compressionhelper.js",
+    "main": "src/compressionhelper.js",
     "config": {},
     "dependencies": {
         "lz-string": "^1.4.4",
