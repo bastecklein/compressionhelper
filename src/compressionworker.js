@@ -1,10 +1,5 @@
-console.log("worker created");
-
 import LZString from "lz-string";
 import { chunkString } from "common-helpers";
-
-console.log(LZString);
-console.log(chunkString);
 
 const MAX_COMPRESS_LENGTH = 10000000;
 const MAX_POST_LENGTH = 5000000;
