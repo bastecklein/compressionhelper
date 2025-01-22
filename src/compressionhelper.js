@@ -20,8 +20,15 @@ export async function decompress(data) {
 
 function doCompressionWork(data, method) {
 
+    console.log("do work: " + method);
+
     return new Promise((resolve, reject) => {
+
+        console.log("create worker");
+
         const cw = new Worker("compressionworker.js");
+
+        console.log(cw);
 
         let inChunks = [];
         let outStr = "";
