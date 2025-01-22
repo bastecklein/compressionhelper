@@ -26,7 +26,9 @@ function doCompressionWork(data, method) {
 
         console.log("create worker");
 
-        const cw = new Worker("compressionworker.js");
+        //const cw = new Worker("compressionworker.js");
+
+        const cw = new Worker(new URL("compressionworker.js", import.meta.url));
 
         console.log(cw);
 
